@@ -1,0 +1,72 @@
+apply plugin: 'com.android.application'
+apply plugin: 'org.sonarqube'
+
+android {
+    sonarqube{
+        properties{
+            property"sonar.projectName","123RFID_mobile_proj"
+            property"sonar.projectKey","123RFID_mobile_proj"
+            property"sonar.host.url","https://sonar.zebra.com"
+
+            property"sonar.language","java"
+            property"sonar.projectBaseDir","c:/myzebra/myprojects/myNGSled/myngsledsdkapp/rfid-integ-main/rfid_android_sdk_app"
+            property"sonar.sources","RFID/API/DemoApps/Android/RFIDReaderX_with_API/app/src/main/java"
+            property"sonar.login","61be2f7591a1f3cb189878fc29d40b3b4d34129c"
+        }
+    }
+
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'com.zebra.rfidreaderAPI.demo'
+        minSdkVersion 26
+        targetSdkVersion 34
+        versionCode System.getenv("VERSION_CODE") ? System.getenv("VERSION_CODE").toInteger() : 144
+        versionName System.getenv("VERSION_NAME") ? System.getenv("VERSION_NAME").toString() : "2.0.3.144"
+        vectorDrawables.useSupportLibrary = true
+
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            android.applicationVariants.all { variant ->
+                variant.outputs.all {
+                    outputFileName = "123_RFID_Mobile-" + defaultConfig.versionName + ".apk"
+                }
+            }
+        }
+
+        debug {
+
+        }
+    }
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
+    buildToolsVersion '30.0.3'
+    namespace 'com.zebra.demo'
+
+}
+dependencies {
+
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.11.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'com.google.android.material:material:1.11.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+    implementation 'com.github.chrisbanes:PhotoView:2.0.0'
+    implementation 'androidx.navigation:navigation-fragment:2.7.7'
+    implementation 'androidx.navigation:navigation-ui:2.7.7'
+    implementation "androidx.recyclerview:recyclerview:1.3.2"
+    implementation 'com.google.android.gms:play-services-location:21.2.0'
+    implementation 'com.google.code.gson:gson:2.10'
+    implementation 'androidx.camera:camera-view:1.3.2'
+    implementation "androidx.camera:camera-camera2:1.3.2"
+    implementation 'androidx.camera:camera-lifecycle:1.3.2'
+    implementation 'com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.0'
+    implementation 'org.apache.commons:commons-lang3:3.7'
+    implementation fileTree(dir: 'libs', include: ['*.aar', '*.jar','API3_NGE-Transport.aar'], exclude: [])
+}
