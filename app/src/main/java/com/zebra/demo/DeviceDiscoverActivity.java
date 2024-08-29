@@ -249,6 +249,29 @@ public class DeviceDiscoverActivity extends BaseActivity implements Readers.RFID
             initialize();
         }
 
+        Button logoutButton = findViewById(R.id.logout_button);
+        logoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                performLogout();
+            }
+        });
+
+    }
+
+    private void performLogout() {
+        // Clear session data
+        SessionManager session = new SessionManager(DeviceDiscoverActivity.this);
+        session.setLogin(false);
+        session.setUser(null);
+        session.setCompanies(null);
+        session.setSelectedCompany(null);
+
+        // Navigate back to the LoginActivity
+        Intent intent = new Intent(DeviceDiscoverActivity.this, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();  // Finish this activity to remove it from the back stack
     }
 
     @Override

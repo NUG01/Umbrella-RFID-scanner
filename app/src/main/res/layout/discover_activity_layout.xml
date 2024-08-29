@@ -43,10 +43,10 @@
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/dis_main_menu"
         app:menu="@menu/disactivity_home_drawer">
-        <RelativeLayout android:layout_height="match_parent"
+        <RelativeLayout
+            android:layout_height="match_parent"
             android:layout_width="match_parent"
-            android:layout_marginLeft="@dimen/margin"
-            >
+            android:layout_marginLeft="@dimen/margin">
 
             <TextView
                 android:layout_width="match_parent"
@@ -55,8 +55,8 @@
                 android:text="@string/batterylife"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
                 android:layout_above="@+id/battery_percentage"
-                android:paddingBottom="@dimen/nav_viewpadding"
-                />
+                android:paddingBottom="@dimen/nav_viewpadding" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -66,7 +66,8 @@
                 android:padding="@dimen/nav_viewpadding"
                 android:paddingBottom="@dimen/default_padding"
                 style="@style/style_bold_font"
-                android:id="@+id/battery_percentage"/>
+                android:id="@+id/battery_percentage" />
+
             <ImageView
                 android:layout_width="40dp"
                 android:layout_height="40dp"
@@ -75,21 +76,33 @@
                 android:layout_alignParentRight="true"
                 android:paddingRight="@dimen/margin"
                 android:paddingBottom="@dimen/default_padding"
-                android:src="@drawable/sled_battery_level"
-                />
+                android:src="@drawable/sled_battery_level" />
+
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="@dimen/marginbottom"
                 android:layout_alignParentBottom="true"
                 android:gravity="center"
+                android:id="@+id/logout_button"
+                android:layout_marginRight="@dimen/margin"
+                android:text="Logout"
+                android:backgroundTint="@color/colorAccent"
+                android:layout_marginBottom="@dimen/margin" />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/marginbottom"
+                android:layout_above="@+id/logout_button"
+                android:gravity="center"
                 android:id="@+id/disconnect_btn"
                 android:layout_marginRight="@dimen/margin"
                 android:text="@string/disconnectrfid"
                 android:backgroundTint="@color/blue"
-                android:layout_marginBottom="@dimen/margin"
-                />
+                android:layout_marginBottom="@dimen/margin" />
         </RelativeLayout>
+
     </com.google.android.material.navigation.NavigationView>
 
 
