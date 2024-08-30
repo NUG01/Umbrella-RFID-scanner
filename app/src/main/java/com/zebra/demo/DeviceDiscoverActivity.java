@@ -86,12 +86,17 @@ import com.zebra.rfid.api3.Readers;
 import com.zebra.rfid.api3.VersionInfo;
 import com.zebra.scannercontrol.DCSSDKDefs;
 
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import static com.zebra.demo.rfidreader.rfid.RFIDController.TAG;
 import static com.zebra.demo.rfidreader.rfid.RFIDController.mConnectedReader;
+
+import org.json.JSONObject;
 //import com.zebra.scannercontrol.SDKHandler;
 
 public class DeviceDiscoverActivity extends BaseActivity implements Readers.RFIDReaderEventHandler, ResponseHandlerInterfaces.ReaderDeviceFoundHandler, ResponseHandlerInterfaces.BatteryNotificationHandler, ScannerAppEngine.IScannerAppEngineDevConnectionsDelegate {
@@ -270,7 +275,91 @@ public class DeviceDiscoverActivity extends BaseActivity implements Readers.RFID
             }
         });
 
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                sendScanData();
+            }
+        }, 5000);
+
     }
+
+    private void sendScanData() {
+        // Hardcoded data for testing
+        String hardcodedData = "ITEM123456";  // Replace with your actual hardcoded data
+
+        // Retrieve user and selected company information from session
+        SessionManager session = new SessionManager(getApplicationContext());
+        JSONObject user = session.getUser();
+        JSONObject selectedCompany = session.getSelectedCompany();
+
+        // Check if user and company data are available
+        if (user != null && selectedCompany != null) {
+            String userId = user.optString("id", ""); // Replace "id" with the actual key used for user ID
+            String companyId = selectedCompany.optString("id", ""); // Replace "id" with the actual key used for company ID
+
+            // Create a new AsyncTask to send the data
+            new ScanTask().execute(hardcodedData, userId, companyId);
+        } else {
+            Log.e("DeviceDiscoverActivity", "User or company data is missing in session.");
+            Toast.makeText(this, "User or company data is missing.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private class ScanTask extends AsyncTask<String, Void, Boolean> {
+        @Override
+        protected Boolean doInBackground(String... params) {
+            String data = params[0];
+            String userId = params[1];
+            String companyId = params[2];
+
+            try {
+                URL url = new URL("http://10.0.2.2:8000/rfid/scan");
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("POST");
+                urlConnection.setRequestProperty("Content-Type", "application/json; utf-8");
+                urlConnection.setRequestProperty("Accept", "application/json");
+                urlConnection.setDoOutput(true);
+
+                // Create JSON request body
+                String jsonInputString = "{\"data\": \"" + data + "\", \"user_id\": \"" + userId + "\", \"company_id\": \"" + companyId + "\"}";
+
+                try (OutputStream os = urlConnection.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes("utf-8");
+                    os.write(input, 0, input.length);
+                }
+
+                int code = urlConnection.getResponseCode();
+                Log.d("ScanTask", "Request URL: " + url);
+                Log.d("ScanTask", "Response Code: " + code);
+
+                if (code == HttpURLConnection.HTTP_OK) {
+                    // Success
+                    return true;
+                } else {
+                    // Error handling code
+                    return false;
+                }
+            } catch (Exception e) {
+                Log.e("ScanTask", "Error sending scan data", e);
+                return false;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Boolean success) {
+            if (success) {
+                // Handle success (e.g., show a toast or update UI)
+                Toast.makeText(DeviceDiscoverActivity.this, "Scan data sent successfully", Toast.LENGTH_SHORT).show();
+            } else {
+                // Handle failure
+                Toast.makeText(DeviceDiscoverActivity.this, "Failed to send scan data", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+
+
 
     private Handler timeoutHandler = new Handler();
     private Runnable timeoutRunnable = new Runnable() {
@@ -821,3 +910,5 @@ public class DeviceDiscoverActivity extends BaseActivity implements Readers.RFID
 
 
 }
+
+
