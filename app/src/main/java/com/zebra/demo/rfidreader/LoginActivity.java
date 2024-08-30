@@ -234,7 +234,8 @@ public class LoginActivity extends AppCompatActivity {
 
             // Save login state and selected company in the session
             SessionManager session = new SessionManager(LoginActivity.this);
-            session.setLogin(true);
+            session.setLogin(true);  // Mark the user as logged in
+            session.updateLastActivityTime();  // Update the last activity time immediately
 
             // Save the user data if it's already stored in the session (from the initial login step)
             if (session.getUser() == null) {
@@ -244,7 +245,6 @@ public class LoginActivity extends AppCompatActivity {
 
             session.setCompanies(companiesArray);
             session.setSelectedCompany(selectedCompany);
-
 
             // Navigate to the main app
             navigateToMainApp();
@@ -259,6 +259,51 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(this, "Unexpected error occurred. Please try again.", Toast.LENGTH_SHORT).show();
         }
     }
+
+//    private void loginToCompany() {
+//        try {
+//            // Get the selected position from the spinner
+//            int selectedPosition = companySpinner.getSelectedItemPosition();
+//
+//            // Ensure a company is selected
+//            if (selectedPosition == AdapterView.INVALID_POSITION) {
+//                Toast.makeText(this, "Please select a company.", Toast.LENGTH_SHORT).show();
+//                return;
+//            }
+//
+//            // Get the selected company based on the position
+//            JSONObject selectedCompany = companiesArray.getJSONObject(selectedPosition);
+//
+//            // Log the selected company for debugging purposes
+//            Log.d("LoginActivity", "Selected company: " + selectedCompany.toString());
+//
+//            // Save login state and selected company in the session
+//            SessionManager session = new SessionManager(LoginActivity.this);
+//            session.setLogin(true);
+//
+//            // Save the user data if it's already stored in the session (from the initial login step)
+//            if (session.getUser() == null) {
+//                Toast.makeText(this, "User data missing. Please check your login flow.", Toast.LENGTH_SHORT).show();
+//                return;
+//            }
+//
+//            session.setCompanies(companiesArray);
+//            session.setSelectedCompany(selectedCompany);
+//
+//
+//            // Navigate to the main app
+//            navigateToMainApp();
+//
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//            Log.e("LoginActivity", "JSONException: " + e.getMessage());
+//            Toast.makeText(this, "Error selecting company. Please try again.", Toast.LENGTH_SHORT).show();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            Log.e("LoginActivity", "Unexpected error: " + e.getMessage());
+//            Toast.makeText(this, "Unexpected error occurred. Please try again.", Toast.LENGTH_SHORT).show();
+//        }
+//    }
 
     private void refreshLoginState() {
         try {

@@ -17,6 +17,9 @@ public class SessionManager {
     private static final String KEY_USER = "user";
     private static final String KEY_COMPANIES = "companies";
     private static final String KEY_SELECTED_COMPANY = "selected_company";
+    private static final String KEY_LAST_ACTIVITY_TIME = "last_activity_time";
+    private static final long TIMEOUT_DURATION = 1 * 60 * 1000;  // 5 minutes in milliseconds
+
 
     // SharedPreferences and Editor instances
     SharedPreferences pref;
@@ -110,6 +113,19 @@ public class SessionManager {
             }
         }
         return null;
+    }
+
+    public void updateLastActivityTime() {
+        long currentTime = System.currentTimeMillis();
+        editor.putLong(KEY_LAST_ACTIVITY_TIME, currentTime);
+        editor.commit();
+
+    }
+
+    public boolean isSessionExpired() {
+        long lastActivityTime = pref.getLong(KEY_LAST_ACTIVITY_TIME, 0);
+        long currentTime = System.currentTimeMillis();
+        return (currentTime - lastActivityTime) > TIMEOUT_DURATION;
     }
 
 }

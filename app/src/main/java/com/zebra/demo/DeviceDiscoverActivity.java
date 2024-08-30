@@ -25,6 +25,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.Parcelable;
 import android.provider.Settings;
 import android.util.Log;
@@ -138,6 +139,8 @@ public class DeviceDiscoverActivity extends BaseActivity implements Readers.RFID
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        timeoutHandler.postDelayed(timeoutRunnable, 60 * 1000);
+
         SessionManager session = new SessionManager(getApplicationContext());
 
         // Check if the user is logged in
@@ -148,6 +151,15 @@ public class DeviceDiscoverActivity extends BaseActivity implements Readers.RFID
             finish();  // Close the current activity
             return; // Exit the method to prevent further execution
         }
+
+        if (session.isSessionExpired()) {
+            performLogout();  // Log out the user if the session has expired
+            return;  // Exit the method to prevent further execution
+        }
+
+        // Update the last activity time since the session is still valid
+        session.updateLastActivityTime();
+
 
         mDeviceDiscoverActivity = this;
         mSavedInstanceState = savedInstanceState;
@@ -253,11 +265,27 @@ public class DeviceDiscoverActivity extends BaseActivity implements Readers.RFID
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                session.updateLastActivityTime();
                 performLogout();
             }
         });
 
     }
+
+    private Handler timeoutHandler = new Handler();
+    private Runnable timeoutRunnable = new Runnable() {
+        @Override
+        public void run() {
+            SessionManager session = new SessionManager(DeviceDiscoverActivity.this);
+            if (session.isSessionExpired()) {
+                performLogout();
+            } else {
+                session.updateLastActivityTime();
+                timeoutHandler.postDelayed(this, 60 * 1000);  // Check again in 1 minute
+            }
+        }
+    };
+
 
     private void performLogout() {
         // Clear session data
@@ -677,6 +705,8 @@ public class DeviceDiscoverActivity extends BaseActivity implements Readers.RFID
                 if( e!= null && e.getStackTrace().length>0){ Log.e(TAG, e.getStackTrace()[0].toString()); }
             }
         }
+
+        timeoutHandler.removeCallbacks(timeoutRunnable);
     }
 
     /**
