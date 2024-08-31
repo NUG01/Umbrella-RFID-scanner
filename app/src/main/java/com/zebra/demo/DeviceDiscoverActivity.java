@@ -96,6 +96,7 @@ import java.util.Locale;
 import static com.zebra.demo.rfidreader.rfid.RFIDController.TAG;
 import static com.zebra.demo.rfidreader.rfid.RFIDController.mConnectedReader;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 //import com.zebra.scannercontrol.SDKHandler;
 
@@ -286,7 +287,7 @@ public class DeviceDiscoverActivity extends BaseActivity implements Readers.RFID
 
     private void sendScanData() {
         // Hardcoded data for testing
-        String hardcodedData = "ITEM123456";  // Replace with your actual hardcoded data
+        String[] itemCodes = {"ITEM123456", "ITEM123460"};  // Replace with your actual data
 
         // Retrieve user and selected company information from session
         SessionManager session = new SessionManager(getApplicationContext());
@@ -299,19 +300,19 @@ public class DeviceDiscoverActivity extends BaseActivity implements Readers.RFID
             String companyId = selectedCompany.optString("id", ""); // Replace "id" with the actual key used for company ID
 
             // Create a new AsyncTask to send the data
-            new ScanTask().execute(hardcodedData, userId, companyId);
+            new ScanTask().execute(itemCodes, userId, companyId);
         } else {
             Log.e("DeviceDiscoverActivity", "User or company data is missing in session.");
             Toast.makeText(this, "User or company data is missing.", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private class ScanTask extends AsyncTask<String, Void, Boolean> {
+    private class ScanTask extends AsyncTask<Object, Void, Boolean> {
         @Override
-        protected Boolean doInBackground(String... params) {
-            String data = params[0];
-            String userId = params[1];
-            String companyId = params[2];
+        protected Boolean doInBackground(Object... params) {
+            String[] itemCodes = (String[]) params[0];
+            String userId = (String) params[1];
+            String companyId = (String) params[2];
 
             try {
                 URL url = new URL("http://10.0.2.2:8000/rfid/scan");
@@ -322,7 +323,19 @@ public class DeviceDiscoverActivity extends BaseActivity implements Readers.RFID
                 urlConnection.setDoOutput(true);
 
                 // Create JSON request body
-                String jsonInputString = "{\"data\": \"" + data + "\", \"user_id\": \"" + userId + "\", \"company_id\": \"" + companyId + "\"}";
+                JSONArray itemsArray = new JSONArray();
+                for (String itemCode : itemCodes) {
+                    JSONObject itemObject = new JSONObject();
+                    itemObject.put("code", itemCode);
+                    itemObject.put("user_id", userId);
+                    itemObject.put("company_id", companyId);
+                    itemsArray.put(itemObject);
+                }
+
+                JSONObject requestBody = new JSONObject();
+                requestBody.put("data", itemsArray);  // Ensure the key is "data"
+
+                String jsonInputString = requestBody.toString();
 
                 try (OutputStream os = urlConnection.getOutputStream()) {
                     byte[] input = jsonInputString.getBytes("utf-8");
