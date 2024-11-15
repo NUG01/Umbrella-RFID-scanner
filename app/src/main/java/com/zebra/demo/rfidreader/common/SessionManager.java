@@ -18,7 +18,7 @@ public class SessionManager {
     private static final String KEY_COMPANIES = "companies";
     private static final String KEY_SELECTED_COMPANY = "selected_company";
     private static final String KEY_LAST_ACTIVITY_TIME = "last_activity_time";
-    private static final long TIMEOUT_DURATION = 5 * 60 * 1000;  // 5 minutes in milliseconds
+    private static final long TIMEOUT_DURATION = 3 * 60 * 1000;  // 5 minutes in milliseconds
 
 
     // SharedPreferences and Editor instances
